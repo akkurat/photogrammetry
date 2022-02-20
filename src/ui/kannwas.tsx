@@ -25,7 +25,7 @@ export class KannWas extends React.Component<{ mappingId: string }> {
         }
     }
     addCircle(p: { x: number, y: number }) {
-        pointService.addPointWithMapping(this.mappingId, { id: this.count, p })
+        pointService.addPointWithMapping(this.mappingId, { id: ''+this.count, p:{u:p.x, v:p.y}} )
 
         const circle = new fabric.Circle({ radius: 10, fill: 'red', top: p.y, left: p.x, originX: 'center', originY: 'center' })
         const text = new fabric.Text('' + this.count++, { top: p.y, left: p.x, })

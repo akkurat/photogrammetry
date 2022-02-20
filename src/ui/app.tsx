@@ -11,8 +11,8 @@ import { pointService } from "./point-service"
 export const App = () => {
 
     const [values, setValues] = React.useState([])
-    React.useEffect(() => { pointService.subscribe(setValues) })
-    const points = values.map((a, i) => [0, i+2, i])
+    React.useEffect(() => { pointService.subscribe((v) => {console.log('whaat');setValues(v)}) }, [])
+    const points = pointService.getApproximations()
 
     return <div className="grid">{
         [<ThreedPreview points={points} />,
@@ -20,7 +20,7 @@ export const App = () => {
         [...Array(10).keys()].map(i =>
             <div className="elgrid">
                 <h2>{i}</h2>
-                <KannWas mappingId="i" />
+                <KannWas mappingId={''+i} />
             </div>
 
         )]} </div>

@@ -1,4 +1,3 @@
-import { useEffect, useRef } from "react"
 import * as React from "react"
 import * as THREE from "three"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
@@ -35,7 +34,7 @@ export class ThreedPreview extends React.Component<{ points: [number, number, nu
         const cube = new THREE.Mesh(geometry, material);
         this.scene.add(cube);
 
-        console.log(...points)
+        console.log('replace geom')
 
         const material2 = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
         for (const point of points) {

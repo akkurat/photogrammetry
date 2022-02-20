@@ -2,15 +2,15 @@ import { Point } from "fabric/fabric-impl"
 import { Dispatch } from "react"
 
 class Mapping {
-    mappings: Map<string,PointWithId<Point2D>> = new Map();
+    mappings: Map<string, PointWithId<Point2D>> = new Map();
     /**
      * Global point Id in 3d space
      */
     // TODO: meta info image size and so on
 
-    addMapping( point: PointWithId<Point2D>) {
+    addMapping(point: PointWithId<Point2D>) {
         this.mappings.set(point.id, point)
-    } 
+    }
 }
 
 
@@ -39,38 +39,45 @@ class PointService {
     subscribe(setValues) {
         this.listeners.push(setValues)
     }
-        
-    
+
+
     points: Set<string>
-    mappings: Map<string,Mapping>
+    mappings: Map<string, Mapping>
     constructor() {
-        this.points = new Set() 
+        this.points = new Set()
         this.listeners = []
         this.mappings = new Map()
     }
 
-    addPointWithMapping(mappingId: string, mapping: PointWithId<Point2D> ): void {
-        if( !this.mappings.has(mappingId) )
-        {
-            this.mappings.set(mappingId, new Mapping() )
+    addPointWithMapping(mappingId: string, mapping: PointWithId<Point2D>): void {
+        if (!this.mappings.has(mappingId)) {
+            this.mappings.set(mappingId, new Mapping())
         }
         const _mapping = this.mappings.get(mappingId)
 
-        if( !this.points.has(mapping.id) ) {
+        if (!this.points.has(mapping.id)) {
             this.points.add(mapping.id)
         }
 
         _mapping.addMapping(mapping)
-       this.sendMappings()
+        this.sendMappings()
 
     }
 
     sendMappings() {
-        this.listeners.forEach( l => l(this.getMappings()))
+        console.log('send')
+        this.listeners.forEach(l => l(this.getMappings()))
     }
 
     getMappings() {
-        return [...this.points].map( pId => ({pId, points: Object.values(this.mappings).map( m => m.mappings.get(pId))}))
+        return [...this.points].map(pId => ({ pId, points: Object.values(this.mappings).map(m => m.mappings.get(pId)) }))
+    }
+    getApproximations(): [number,number,number][] {
+        if (this.mappings.size > 0) {
+            const hm = [...this.mappings.values().next().value.mappings.values()]
+            return hm.map((p: PointWithId<Point2D>) => ([p.p.u, p.p.v, 0]))
+        }
+        return []
     }
 }
 
