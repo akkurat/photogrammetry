@@ -1,13 +1,21 @@
 import * as React from "react"
 import { fabric } from "fabric"
-import { pointService } from "./point-service"
+import { camKey, pointService } from "./point-service"
 
-export class KannWas extends React.Component<{ mappingId: string }> {
+
+
+type KannwasProps = {
+    mappingId: string
+    camera: Record<camKey, number>
+    imgUrl: string
+}
+
+export class KannWas extends React.Component<KannwasProps> {
     rcanvas: React.RefObject<HTMLCanvasElement>
     fcanvas: fabric.Canvas
     count = 1
     mappingId: string
-    constructor(props: Readonly<{ mappingId: string }>) {
+    constructor(props: Readonly<KannwasProps>) {
         super(props)
         this.rcanvas = React.createRef()
         this.mappingId = props.mappingId
@@ -17,10 +25,12 @@ export class KannWas extends React.Component<{ mappingId: string }> {
         this.fcanvas.setWidth(800)
         this.fcanvas.setHeight(1000)
         this.fcanvas.on('mouse:up', e => this.handleMouseUp(e))
+        this.loadImage(this.props.imgUrl)
     }
+    
     private handleMouseUp(e: fabric.IEvent<MouseEvent>) {
-        console.log(e)
         if (e.isClick && e.target === null) {
+            console.log(e)
             this.addCircle(e.absolutePointer)
         }
     }
@@ -33,28 +43,21 @@ export class KannWas extends React.Component<{ mappingId: string }> {
         const group = new fabric.Group([circle, text])
         group.hasControls = false
         this.fcanvas.add(group)
-
     }
 
     render(): React.ReactNode {
-        return <div>
-            <input type="file" onChange={e => this.handleFileChanged(e)}></input>
+        const camera={X:10,Y:10,Z:0,alpha:0,beta:0,gamma:0,...this.props?.camera}
+        return <div className="kannwas">
+            {[...Object.entries(camera)].map(([k,v]) =><div><label>{k}<input type="number" value={v} onChange={e => {pointService.updateCameraParam(this.mappingId,{[k]: e.target.value})} }/></label></div>)}
             <canvas ref={this.rcanvas}></canvas>
         </div>
     }
 
-    private handleFileChanged(e: React.ChangeEvent<HTMLInputElement>) {
-        console.log(e, this)
-        const files = e.target.files
-        if (files.length > 0) {
-            this.loadImage(files[0])
-        }
-    }
-    private loadImage(file: File) {
-        const imgURL = URL.createObjectURL(file)
+    private loadImage(imgURL: string) {
         fabric.Image.fromURL(imgURL, fimg => {
             this.fcanvas.setHeight(fimg.height)
             this.fcanvas.setWidth(fimg.width)
+            pointService.updateCameraParam(this.mappingId,{width: fimg.width, height: fimg.height})
             // this.fimg = fimg
             this.fcanvas.setBackgroundImage(fimg, () => { })
 

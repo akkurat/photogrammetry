@@ -13,7 +13,8 @@
     "buffer": "^6.0.3",
     "fabric": "^5.1.0",
     "projection-3d-2d": "^2.0.8",
-    "three": "^0.137.5"
+    "three": "^0.137.5",
+    "three.meshline": "github:NZhuravlev/THREE.MeshLine#358d2f801de9b80f0708fbf4f2868a9ac7aa381c"
   },
   "devDependencies": {
     "@parcel/transformer-less": "^2.3.1",
