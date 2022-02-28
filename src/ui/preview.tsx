@@ -16,16 +16,17 @@ export class ThreedPreview extends React.Component<ThreedPreviewProps>
     scene: THREE.Scene;
     private initScene(dom: HTMLDivElement) {
         this.scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.01, 100000);
+        const aspect = dom.clientWidth / dom.clientHeight
+        const camera = new THREE.PerspectiveCamera(75, aspect, 0.01, 100000);
 
         const renderer = new THREE.WebGLRenderer();
-        renderer.setSize(500, 500);
+        renderer.setSize(dom.clientWidth, dom.clientHeight);
         dom.appendChild(renderer.domElement);
 
         camera.position.z = 10;
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.minDistance = 0.0001;
-        controls.maxDistance = 200;
+        controls.maxDistance = 2000;
         controls.target.set(0, 0, 0);
         controls.update();
         const animate = () => {
@@ -59,15 +60,12 @@ export class ThreedPreview extends React.Component<ThreedPreviewProps>
 
         for (const camera of cameras) {
             const p = camera.params
-            const scale = 1/p.width;
+            const scale = 100/p.width;
 
-            const focus = new Vector3(0.5, scale * p.height * 0.5, 0)
+            const focus = new Vector3(0.5, scale * p.height * 0.5, p.f) 
 
-            const imagePoints = [...camera.mappings.values()].map( mapping => new Vector3(mapping.p.u*scale, mapping.p.v*scale, -1) )
+            const imagePoints = [...camera.mappings.values()].map( mapping => new Vector3(mapping.p.u*scale, mapping.p.v*scale, 2*p.f) )
             
-            const chull = new ConvexGeometry( imagePoints )
-            
-            this.scene.add( new THREE.Mesh(chull, materialMesh ))
             
             for(const imagePoint of imagePoints) {
                 const line = new MeshLine();
@@ -110,7 +108,7 @@ export class ThreedPreview extends React.Component<ThreedPreviewProps>
 
 
     render() {
-        return <div ref={this.target}></div>
+        return <div className="preview" ref={this.target}></div>
     }
 }
 
